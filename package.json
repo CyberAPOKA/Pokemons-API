@@ -20,6 +20,7 @@
     "dependencies": {
         "laravel-vue-pagination": "^4.0.0",
         "vue-paginate": "^3.6.0",
-        "vuejs-paginate": "^2.1.0"
+        "vuejs-paginate": "^2.1.0",
+        "vuex": "^4.1.0"
     }
 }
