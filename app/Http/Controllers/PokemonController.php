@@ -40,12 +40,14 @@ class PokemonController extends Controller
             $pokemon = new Pokemon([
                 'id' => $pokemonData['id'],
                 'name' => $pokemonData['name'],
-                'img' => $imgBase64
+                'img' => $imgBase64,
+                'type' => implode(",", $pokemonData['type']),
+                'height' => $pokemonData['height'],
+                'weight' => $pokemonData['weight'],
             ]);
             $pokemon->save();
         }
-
-        // return $pokemons;
+        return $pokemons;
     }
 
     public function getPokemons(Request $request)
@@ -54,7 +56,7 @@ class PokemonController extends Controller
             return $query->where('name', 'LIKE', '%' . $name . '%');
         })
             ->orderBy('id')
-            ->paginate(10);
+            ->paginate(4);
 
         return [
             'pokemons' => $pokemons

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <!-- <div class="container">
     <div class="row">
       <div class="col-md-3">
         <label class="form-control-label" for="level">Turno</label>
@@ -13,7 +13,8 @@
         />
       </div>
     </div>
-  </div>
+  </div> -->
+
   <div
     class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
   >
@@ -36,25 +37,25 @@
             <div class="mt-1 p-2">
               <h2 class="text-slate-700">{{ pokemon.id }}-{{ pokemon.name }}</h2>
               <p class="mt-1 text-sm text-slate-400">
-                <!-- {{ pokemon.type.join(" and ") }} -->aaa
+                {{ pokemon.type }}
               </p>
 
               <div class="mt-3 flex items-end justify-between">
                 <p class="text-lg font-bold text-blue-500">
-                  <!-- {{ pokemon.height }} -->aaa
+                  {{ pokemon.height }}
                 </p>
                 <p class="text-lg font-bold text-blue-500">
-                  <!-- {{ pokemon.weight }} -->aaa
+                  {{ pokemon.weight }}
                 </p>
               </div>
             </div>
           </a>
         </div>
       </div>
-      <Bootstrap4Pagination
+      <TailwindPagination
         :data="pokemons"
         :filters="filters"
-        @pagination-change-page="(page) => getRequests(page, filters)"
+        @pagination-change-page="(page) => getPokemons(page, filters)"
       />
     </div>
   </div>
@@ -62,7 +63,7 @@
 <script setup>
 import axios from "axios";
 import { ref, watchEffect, reactive, onMounted } from "vue";
-import { Bootstrap4Pagination } from "laravel-vue-pagination";
+import { TailwindPagination } from "laravel-vue-pagination";
 import { createStore } from "vuex";
 
 const getImageUrl = (base64) => {
@@ -121,3 +122,9 @@ watchEffect(() => {
   getPokemons();
 });
 </script>
+
+<style>
+img {
+  width: 100%;
+}
+</style>

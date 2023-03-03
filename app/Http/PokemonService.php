@@ -15,6 +15,6 @@ class PokemonService
         $response = curl_exec($ch);
         curl_close($ch);
         $data = json_decode($response, true);
-        return array_slice($data['pokemon'], 0, 5);
+        return array_slice($data['pokemon'], 0, 30);
     }
 }
