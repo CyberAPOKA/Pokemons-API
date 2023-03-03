@@ -77,7 +77,7 @@ class PokemonController extends Controller
                 return $query->where('type', 'LIKE', '%' . $type . '%');
             })
             ->orderBy($request->orderBy ?? 'id')
-            ->paginate(4);
+            ->paginate($request->perPage ?? 4);
 
         return [
             'pokemons' => $pokemons

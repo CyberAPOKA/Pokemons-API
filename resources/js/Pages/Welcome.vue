@@ -59,6 +59,21 @@
           <option value="height">Altura</option>
         </select>
       </div>
+      <div>
+        <label class="text-white px-2" for="perPage">Pokemons por página</label>
+        <select
+          v-model="pokemonsPerPage"
+          :searchable="true"
+          placeholder="Pokemons por página"
+          class="form-control"
+          id="perPage"
+          name="perPage"
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -143,6 +158,7 @@ const filters = reactive({
   type: "",
   order: "",
 });
+const pokemonsPerPage = ref(5);
 
 const store = createStore({
   state: {
@@ -164,6 +180,7 @@ const getPokemons = (page = 1, filters = store.state.filters) => {
   if (Array.isArray(params.type)) {
     params.type = params.type.join(",");
   }
+  params.perPage = pokemonsPerPage.value;
   axios
     .get(`api/pokemons?page=${page}`, {
       params,
@@ -191,7 +208,7 @@ watchEffect(() => {
   });
 });
 
-watch(orderBy, () => {
+watch(pokemonsPerPage, () => {
   getPokemons(1, {
     orderBy: orderBy.value,
     name: searchName.value,
