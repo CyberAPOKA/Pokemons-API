@@ -75,9 +75,27 @@ class PokemonController extends Controller
         })
             ->when($request->type, function ($query, $type) {
                 return $query->where('type', 'LIKE', '%' . $type . '%');
-            })
-            ->orderBy($request->orderBy ?? 'id')
-            ->paginate($request->perPage ?? 4);
+            });
+
+        switch ($request->orderBy) {
+            case 'weight_desc':
+                $pokemons = $pokemons->orderByDesc('weight');
+                break;
+            case 'weight_asc':
+                $pokemons = $pokemons->orderBy('weight');
+                break;
+            case 'height_desc':
+                $pokemons = $pokemons->orderByDesc('height');
+                break;
+            case 'height_asc':
+                $pokemons = $pokemons->orderBy('height');
+                break;
+            default:
+                $pokemons = $pokemons->orderBy($request->orderBy ?? 'id');
+                break;
+        }
+
+        $pokemons = $pokemons->paginate($request->perPage ?? 4);
 
         return [
             'pokemons' => $pokemons

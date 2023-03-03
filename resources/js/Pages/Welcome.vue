@@ -55,8 +55,10 @@
         >
           <option value="id" selected>ID</option>
           <option value="name">Nome</option>
-          <option value="weight">Peso</option>
-          <option value="height">Altura</option>
+          <option value="weight_desc">Maior Peso</option>
+          <option value="weight_asc">Menor Peso</option>
+          <option value="height_desc">Maior Altura</option>
+          <option value="height_asc">Menor Altura</option>
         </select>
       </div>
       <div>
