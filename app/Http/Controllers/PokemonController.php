@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Models\Pokemon;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\DB;
 
 class PokemonController extends Controller
 {
@@ -21,8 +22,22 @@ class PokemonController extends Controller
     public function index()
     {
         $pokemons = Pokemon::all();
-        return Inertia::render('Welcome', ['pokemons' => $pokemons]);
+
+        $types = array();
+        foreach ($pokemons as $pokemon) {
+            $pokemonTypes = explode(',', $pokemon->type);
+            $types = array_merge($types, $pokemonTypes);
+        }
+
+        $uniqueTypes = array_unique($types);
+        sort($uniqueTypes);
+
+        return Inertia::render('Welcome', [
+            'pokemons' => $pokemons,
+            'pokemonTypes' => $uniqueTypes
+        ]);
     }
+
 
     public function savePokemons()
     {
@@ -36,14 +51,17 @@ class PokemonController extends Controller
             })->encode('jpg', 80);
 
             $imgBase64 = base64_encode($img);
+            $height = preg_replace("/[^0-9.]/", "", $pokemonData['height']);
+            $weight = preg_replace("/[^0-9.]/", "", $pokemonData['weight']);
 
             $pokemon = new Pokemon([
                 'id' => $pokemonData['id'],
                 'name' => $pokemonData['name'],
-                'img' => $imgBase64,
+                // 'img' => $imgBase64,
+                'img' => null,
                 'type' => implode(",", $pokemonData['type']),
-                'height' => $pokemonData['height'],
-                'weight' => $pokemonData['weight'],
+                'height' => $height,
+                'weight' => $weight,
             ]);
             $pokemon->save();
         }
@@ -55,7 +73,10 @@ class PokemonController extends Controller
         $pokemons = Pokemon::when($request->name, function ($query, $name) {
             return $query->where('name', 'LIKE', '%' . $name . '%');
         })
-            ->orderBy('id')
+            ->when($request->type, function ($query, $type) {
+                return $query->where('type', 'LIKE', '%' . $type . '%');
+            })
+            ->orderBy($request->orderBy ?? 'id')
             ->paginate(4);
 
         return [

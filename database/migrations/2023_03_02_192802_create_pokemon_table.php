@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('pokemon', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->longText('img');
+            $table->longText('img')->nullable();
             $table->string('type');
-            $table->string('height');
-            $table->string('weight');
+            $table->float('height');
+            $table->float('weight');
             $table->timestamps();
         });
     }

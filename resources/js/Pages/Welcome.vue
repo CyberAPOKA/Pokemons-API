@@ -1,26 +1,73 @@
 <template>
-  <!-- <div class="container">
-    <div class="row">
-      <div class="col-md-3">
-        <label class="form-control-label" for="level">Turno</label>
+  <div class="relative dark:bg-gray-900">
+    <div class="container mx-auto text-center">
+      <div class="text-white">
+        <h1 class="text-xl">
+          Este é um projeto sobre API de Pokemons com Laravel 10, Vue 3 e Tailwind!
+        </h1>
+        <div>
+          Eu estou pegando todos os Pokemons via API do link
+          <a class="text-sky-400" href="https://www.canalti.com.br/api/pokemons.json"
+            >www.canalti.com.br/api/pokemons.json</a
+          >
+          e salvando-os dados no banco de dados.
+        </div>
+        <div>
+          O sistema permite a paginação de pokemons por página, diversos filtros,
+          ordenações, visualização, edição, criação e exclusão de Pokemons.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative dark:bg-gray-900">
+    <div class="container mx-auto grid grid-cols-4 p-2 gap-6">
+      <div>
+        <label class="text-white px-2" for="level">Nome</label>
         <input
           type="text"
           v-model="searchName"
           id="level"
           name="level"
-          class="form-control"
+          class="bg-white border border-l-gray-50 rounded"
           placeholder="Nome"
         />
       </div>
+      <div>
+        <label class="text-white px-2" for="level">Turno</label>
+        <Multiselect
+          v-model="searchType"
+          :searchable="true"
+          placeholder="Selecione uma Opção"
+          class="form-control"
+          :options="pokemonTypes"
+        />
+      </div>
+      <div>
+        <label class="text-white px-2" for="order">Ordernar por</label>
+        <select
+          v-model="orderBy"
+          :searchable="true"
+          placeholder="Selecione uma Opção"
+          class="form-control"
+          id="order"
+          name="order"
+        >
+          <option value="id" selected>ID</option>
+          <option value="name">Nome</option>
+          <option value="weight">Peso</option>
+          <option value="height">Altura</option>
+        </select>
+      </div>
     </div>
-  </div> -->
+  </div>
 
   <div
-    class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
+    class="relative sm:flex sm:justify-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
   >
     <div class="max-w-7xl mx-auto p-6 lg:p-8">
       <div
-        class="mx-auto grid max-w-6xl grid-cols-1 gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        class="mx-auto grid max-w-6xl grid-cols-1 gap-6 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
       >
         <div
           v-for="(pokemon, index) in pokemons.data"
@@ -35,36 +82,37 @@
             </div>
 
             <div class="mt-1 p-2">
-              <h2 class="text-slate-700">{{ pokemon.id }}-{{ pokemon.name }}</h2>
+              <h2 class="text-slate-700">
+                {{ pokemon.id }}-{{ pokemon.name.split(" ")[0] }}
+              </h2>
               <p class="mt-1 text-sm text-slate-400">
                 {{ pokemon.type }}
               </p>
 
               <div class="mt-3 flex items-end justify-between">
-                <p class="text-lg font-bold text-blue-500">
-                  {{ pokemon.height }}
-                </p>
-                <p class="text-lg font-bold text-blue-500">
-                  {{ pokemon.weight }}
-                </p>
+                <p class="text-lg font-bold text-blue-500">{{ pokemon.height }}m</p>
+                <p class="text-lg font-bold text-blue-500">{{ pokemon.weight }}kg</p>
               </div>
             </div>
           </a>
         </div>
       </div>
-      <TailwindPagination
-        :data="pokemons"
-        :filters="filters"
-        @pagination-change-page="(page) => getPokemons(page, filters)"
-      />
+      <div class="pl-5 text-center">
+        <TailwindPagination
+          :data="pokemons"
+          :filters="filters"
+          @pagination-change-page="(page) => getPokemons(page, filters)"
+        />
+      </div>
     </div>
   </div>
 </template>
 <script setup>
 import axios from "axios";
-import { ref, watchEffect, reactive, onMounted } from "vue";
+import { ref, watchEffect, reactive, onMounted, computed, defineProps, watch } from "vue";
 import { TailwindPagination } from "laravel-vue-pagination";
 import { createStore } from "vuex";
+import Multiselect from "@vueform/multiselect";
 
 const getImageUrl = (base64) => {
   if (!base64) return "";
@@ -82,17 +130,26 @@ const getImageUrl = (base64) => {
   return url;
 };
 
+const props = defineProps({
+  pokemonTypes: Array,
+});
+
 const pokemons = ref({ data: [] });
 const searchName = ref(null);
-
+const searchType = ref(null);
+const orderBy = ref(null);
 const filters = reactive({
   name: "",
+  type: "",
+  order: "",
 });
 
 const store = createStore({
   state: {
     filters: {
       name: "",
+      type: "",
+      order: "",
     },
   },
   mutations: {
@@ -103,9 +160,13 @@ const store = createStore({
 });
 
 const getPokemons = (page = 1, filters = store.state.filters) => {
+  let params = { ...filters };
+  if (Array.isArray(params.type)) {
+    params.type = params.type.join(",");
+  }
   axios
     .get(`api/pokemons?page=${page}`, {
-      params: filters,
+      params,
     })
     .then((response) => {
       pokemons.value = response.data.pokemons;
@@ -114,17 +175,35 @@ const getPokemons = (page = 1, filters = store.state.filters) => {
 
 onMounted(() => {
   searchName.value = "";
+  searchType.value = "";
+  orderBy.value = "";
 });
 
 watchEffect(() => {
   filters.name = searchName.value;
+  filters.type = searchType.value;
+  filters.order = orderBy.value;
   store.commit("setFilters", filters);
-  getPokemons();
+  getPokemons(1, {
+    orderBy: orderBy.value,
+    name: searchName.value,
+    type: searchType.value,
+  });
+});
+
+watch(orderBy, () => {
+  getPokemons(1, {
+    orderBy: orderBy.value,
+    name: searchName.value,
+    type: searchType.value,
+  });
 });
 </script>
 
 <style>
 img {
-  width: 100%;
+  width: 10rem;
+  height: 10rem;
 }
 </style>
+<style src="@vueform/multiselect/themes/default.css"></style>
