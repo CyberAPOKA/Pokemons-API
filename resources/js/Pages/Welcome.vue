@@ -1,80 +1,98 @@
 <template>
   <div class="relative dark:bg-gray-900">
-    <div class="container mx-auto text-center">
-      <div class="text-white">
-        <h1 class="text-xl">
-          Este é um projeto sobre API de Pokemons com Laravel 10, Vue 3 e Tailwind!
-        </h1>
-        <div>
-          Eu estou pegando todos os Pokemons via API do link
-          <a class="text-sky-400" href="https://www.canalti.com.br/api/pokemons.json"
-            >www.canalti.com.br/api/pokemons.json</a
-          >
-          e salvando-os dados no banco de dados.
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 p-2 gap-6">
+      <div>
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 p-2 gap-6">
+          <div>
+            <label class="text-white px-2" for="name">Nome</label>
+            <div class="mt-1">
+              <input
+                type="text"
+                v-model="searchName"
+                id="name"
+                name="name"
+                class="bg-white border border-l-gray-50 rounded w-full"
+                placeholder="Pesquise..."
+              />
+            </div>
+          </div>
+          <div>
+            <label class="text-white px-2" for="level">Selecione o tipo</label>
+            <div class="mt-1">
+              <Multiselect
+                v-model="searchType"
+                :searchable="true"
+                name="level"
+                id="level"
+                placeholder="Selecione uma Opção"
+                class="bg-white border border-l-gray-50 rounded w-full"
+                :options="pokemonTypes"
+              />
+            </div>
+          </div>
         </div>
-        <div>
-          O sistema permite a paginação de pokemons por página, diversos filtros,
-          ordenações, visualização, edição, criação e exclusão de Pokemons.
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 p-2 gap-6">
+          <div>
+            <label class="text-white px-2" for="order">Ordenação por</label>
+            <div class="mt-1">
+              <select
+                v-model="orderBy"
+                placeholder="Selecione uma Opção"
+                class="bg-white border border-l-gray-50 rounded w-full"
+                id="order"
+                name="order"
+              >
+                <option value="id">ID</option>
+                <option value="name">Nome A-Z</option>
+                <option value="weight_desc">Maior Peso</option>
+                <option value="weight_asc">Menor Peso</option>
+                <option value="height_desc">Maior Altura</option>
+                <option value="height_asc">Menor Altura</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="text-white px-2" for="perPage">Nº de Pokemons por página</label>
+            <div class="mt-1">
+              <select
+                v-model="pokemonsPerPage"
+                placeholder="Pokemons por página"
+                class="bg-white border border-l-gray-50 rounded w-full"
+                id="perPage"
+                name="perPage"
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="15">20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="9999">Todos</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="relative dark:bg-gray-900">
-    <div class="container mx-auto grid grid-cols-4 p-2 gap-6">
-      <div>
-        <label class="text-white px-2" for="level">Nome</label>
-        <input
-          type="text"
-          v-model="searchName"
-          id="level"
-          name="level"
-          class="bg-white border border-l-gray-50 rounded"
-          placeholder="Nome"
-        />
-      </div>
-      <div>
-        <label class="text-white px-2" for="level">Turno</label>
-        <Multiselect
-          v-model="searchType"
-          :searchable="true"
-          placeholder="Selecione uma Opção"
-          class="form-control"
-          :options="pokemonTypes"
-        />
-      </div>
-      <div>
-        <label class="text-white px-2" for="order">Ordernar por</label>
-        <select
-          v-model="orderBy"
-          :searchable="true"
-          placeholder="Selecione uma Opção"
-          class="form-control"
-          id="order"
-          name="order"
-        >
-          <option value="id" selected>ID</option>
-          <option value="name">Nome</option>
-          <option value="weight_desc">Maior Peso</option>
-          <option value="weight_asc">Menor Peso</option>
-          <option value="height_desc">Maior Altura</option>
-          <option value="height_asc">Menor Altura</option>
-        </select>
-      </div>
-      <div>
-        <label class="text-white px-2" for="perPage">Pokemons por página</label>
-        <select
-          v-model="pokemonsPerPage"
-          :searchable="true"
-          placeholder="Pokemons por página"
-          class="form-control"
-          id="perPage"
-          name="perPage"
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-        </select>
+      <div class="container mx-auto text-white">
+        <div class="text-center text-xl"><h1>API de Pokemons</h1></div>
+        <div>
+          <span
+            >Este projeto é uma simples API de Pokemons deste
+            <a class="text-blue-500" href="https://www.canalti.com.br/api/pokemons.json">
+              LINK</a
+            >
+            onde eu salvo todos os itens no banco de dados e depois retorno os dados dando
+            a possibilidade do usuários fazer diversos filtros e ordenações.
+            <div>
+              <h1 class="text-red-600">Tecnologias e versões usadas:</h1>
+              <span
+                >Laravel 10, Vue 3 com Inertia, Tailwind, Vite e algumas
+                bibliotecas.</span
+              >
+            </div>
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -91,7 +109,7 @@
           :key="pokemon.id"
           :pokemons="pokemons"
           :index="index"
-          class="rounded-xl bg-white p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300"
+          class="rounded-xl w-44 bg-white p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300"
         >
           <a href="#">
             <div class="relative flex items-end overflow-hidden rounded-xl">
@@ -116,8 +134,11 @@
       </div>
       <div class="pl-5 text-center">
         <TailwindPagination
+          class=""
           :data="pokemons"
           :filters="filters"
+          :limit="limit"
+          :show-last-page="true"
           @pagination-change-page="(page) => getPokemons(page, filters)"
         />
       </div>
@@ -158,10 +179,10 @@ const orderBy = ref(null);
 const filters = reactive({
   name: "",
   type: "",
-  order: "",
+  order: "id",
 });
+const limit = ref(5);
 const pokemonsPerPage = ref(5);
-
 const store = createStore({
   state: {
     filters: {
@@ -195,10 +216,15 @@ const getPokemons = (page = 1, filters = store.state.filters) => {
 onMounted(() => {
   searchName.value = "";
   searchType.value = "";
-  orderBy.value = "";
+  orderBy.value = "id";
 });
 
 watchEffect(() => {
+  if (window.innerWidth < 768) {
+    limit.value = 1;
+  } else {
+    limit.value = 5;
+  }
   filters.name = searchName.value;
   filters.type = searchType.value;
   filters.order = orderBy.value;

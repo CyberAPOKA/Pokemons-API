@@ -41,7 +41,7 @@ class PokemonController extends Controller
 
     public function savePokemons()
     {
-        ini_set('max_execution_time', 1200);
+        ini_set('max_execution_time', 6000);
         $pokemons = $this->pokemonService->getPokemons();
 
         foreach ($pokemons as $pokemonData) {
@@ -57,8 +57,7 @@ class PokemonController extends Controller
             $pokemon = new Pokemon([
                 'id' => $pokemonData['id'],
                 'name' => $pokemonData['name'],
-                // 'img' => $imgBase64,
-                'img' => null,
+                'img' => $imgBase64,
                 'type' => implode(",", $pokemonData['type']),
                 'height' => $height,
                 'weight' => $weight,
@@ -95,7 +94,7 @@ class PokemonController extends Controller
                 break;
         }
 
-        $pokemons = $pokemons->paginate($request->perPage ?? 4);
+        $pokemons = $pokemons->paginate($request->perPage ?? 5);
 
         return [
             'pokemons' => $pokemons
